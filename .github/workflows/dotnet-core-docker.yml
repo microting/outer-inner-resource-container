@@ -43,11 +43,11 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 5.0.100
+        dotnet-version: 6.0.x
     - name: Use Node.js
       uses: actions/setup-node@v1
       with:
-        node-version: '14.16.1'
+        node-version: '14.18.3'
     - name: 'Preparing Frontend checkout'
       uses: actions/checkout@v2
       with:
@@ -79,7 +79,7 @@ jobs:
       run: cd eform-angular-frontend/eform-client && npm run testheadless
     - name: testheadless2${{matrix.test}}
       run: cd eform-angular-frontend/eform-client && npm run testheadless2${{matrix.test}}
-  items-planning-build:
+  outer-inner-resource-build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -112,11 +112,11 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 5.0.100
+        dotnet-version: 6.0.x
     - name: Use Node.js
       uses: actions/setup-node@v1
       with:
-        node-version: '14.16.1'
+        node-version: '14.18.3'
     - name: 'Preparing Frontend checkout'
       uses: actions/checkout@v2
       with:
@@ -127,327 +127,31 @@ jobs:
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-        repository: microting/eform-angular-items-planning-plugin
+        repository: microting/eform-angular-outer-inner-resource-plugin
         ref: stable
-        path: eform-angular-items-planning-plugin
+        path: eform-angular-outer-inner-resource-plugin
     - name: Install dependencies
-      run: dotnet restore eform-angular-items-planning-plugin/eFormAPI/Plugins/ItemsPlanning.Pn/ItemsPlanning.Pn.sln
+      run: dotnet restore eform-angular-outer-inner-resource-plugin/eFormAPI/Plugins/OuterInnerResource.Pn/OuterInnerResource.Pn.sln
     - name: Get the version
       id: get_version
       run: echo ::set-output name=VERSION::$(echo $GITHUB_REF | cut -d / -f 3 | cut -d "v" -f 2)
     - name: Build
-      run: dotnet build eform-angular-items-planning-plugin/eFormAPI/Plugins/ItemsPlanning.Pn/ItemsPlanning.Pn.sln
+      run: dotnet build eform-angular-outer-inner-resource-plugin/eFormAPI/Plugins/OuterInnerResource.Pn/OuterInnerResource.Pn.sln
     - name: Unit Tests
-      run: dotnet test --no-restore -c Release -v n eform-angular-items-planning-plugin/eFormAPI/Plugins/ItemsPlanning.Pn/ItemsPlanning.Pn.Test/ItemsPlanning.Pn.Test.csproj
+      run: dotnet test --no-restore -c Release -v n eform-angular-outer-inner-resource-plugin/eFormAPI/Plugins/OuterInnerResource.Pn/OuterInnerResource.Pn.Test/OuterInnerResource.Pn.Test.csproj
     - name: Copy dependencies
       run: |
-        cp -av eform-angular-items-planning-plugin/eform-client/src/app/plugins/modules/items-planning-pn eform-angular-frontend/eform-client/src/app/plugins/modules/items-planning-pn
-        cp -av eform-angular-items-planning-plugin/eform-client/e2e/Tests/items-planning-settings eform-angular-frontend/eform-client/e2e/Tests/items-planning-settings
-        cp -av eform-angular-items-planning-plugin/eform-client/e2e/Tests/items-planning-general eform-angular-frontend/eform-client/e2e/Tests/items-planning-general
-        cp -av eform-angular-items-planning-plugin/eform-client/e2e/Page\ objects/ItemsPlanning eform-angular-frontend/eform-client/e2e/Page\ objects/ItemsPlanning
-        cp -av eform-angular-items-planning-plugin/eform-client/e2e/Assets eform-angular-frontend/eform-client/e2e/Assets
-        cp -av eform-angular-items-planning-plugin/eform-client/wdio-headless-plugin-step2.conf.js eform-angular-frontend/eform-client/wdio-headless-plugin-step2.conf.js
-        cp -av eform-angular-items-planning-plugin/eform-client/wdio-plugin-step2.conf.js eform-angular-frontend/eform-client/wdio-plugin-step2.conf.js
+        cp -av eform-angular-outer-inner-resource-plugin/eform-client/src/app/plugins/modules/outer-inner-resource-pn eform-angular-frontend/eform-client/src/app/plugins/modules/outer-inner-resource-pn
+        cp -av eform-angular-outer-inner-resource-plugin/eform-client/e2e/Tests/outer-inner-resource-settings eform-angular-frontend/eform-client/e2e/Tests/outer-inner-resource-settings
+        cp -av eform-angular-outer-inner-resource-plugin/eform-client/e2e/Tests/outer-inner-resource-general eform-angular-frontend/eform-client/e2e/Tests/outer-inner-resource-general
+        cp -av eform-angular-outer-inner-resource-plugin/eform-client/e2e/Page\ objects/OuterInnerResource eform-angular-frontend/eform-client/e2e/Page\ objects/OuterInnerResource
+        cp -av eform-angular-outer-inner-resource-plugin/eform-client/wdio-headless-plugin-step2.conf.js eform-angular-frontend/eform-client/wdio-headless-plugin-step2.conf.js
+        cp -av eform-angular-outer-inner-resource-plugin/eform-client/wdio-plugin-step2.conf.js eform-angular-frontend/eform-client/wdio-plugin-step2.conf.js
         mkdir -p eform-angular-frontend/eFormAPI/eFormAPI.Web/Plugins
-        cp -av eform-angular-items-planning-plugin/eFormAPI/eFormAPI.Web/Plugins/ItemsPlanning eform-angular-frontend/eFormAPI/eFormAPI.Web/Plugins/ItemsPlanning
-        cd eform-angular-frontend/eform-client && ../../eform-angular-items-planning-plugin/testinginstallpn.sh
+        cp -av eform-angular-outer-inner-resource-plugin/eFormAPI/eFormAPI.Web/Plugins/OuterInnerResource eform-angular-frontend/eFormAPI/eFormAPI.Web/Plugins/OuterInnerResource
+        cd eform-angular-frontend/eform-client && ../../eform-angular-outer-inner-resource-plugin/testinginstallpn.sh
     - name: Build frontend
       run: dotnet build eform-angular-frontend/eFormAPI/eFormAPI.sln
-    - name: NPM install
-      run: cd eform-angular-frontend/eform-client && npm install
-    - name: NPM start
-      run: cd eform-angular-frontend/eform-client && npm start > npm_log 2>&1 &
-    - name: Sleep 75 seconds
-      run: sleep 75
-    - name: Dotnet run
-      run: dotnet run --project eform-angular-frontend/eFormAPI/eFormAPI.Web/eFormAPI.Web.csproj > dotnet_log 2>&1 &
-    - name: Sleep 75 seconds
-      run: sleep 75
-    - name: Configuration testing
-      run: cd eform-angular-frontend/eform-client && npm run testheadless
-    - name: Plugin testing
-      run: cd eform-angular-frontend/eform-client && npm run testheadlessplugin
-  workflow-build:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        path: main
-    - name: Upgrade Chrome browser
-      run: |
-        sudo apt-get update
-        sudo apt-get --only-upgrade install google-chrome-stable
-        google-chrome --version
-    - uses: getong/mariadb-action@v1.1
-      with:
-        host port: 3306 # Optional, default value is 3306. The port of host
-        container port: 3306 # Optional, default value is 3306. The port of container
-        character set server: 'utf8' # Optional, default value is 'utf8mb4'. The '--character-set-server' option for mysqld
-        collation server: 'utf8_general_ci' # Optional, default value is 'utf8mb4_general_ci'. The '--collation-server' option for mysqld
-        mariadb version: '10.4.10' # Optional, default value is "latest". The version of the MariaDB
-        mysql database: 'some_test' # Optional, default value is "test". The specified database which will be create
-        mysql root password: 'secretpassword' # Required if "mysql user" is empty, default is empty. The root superuser password
-        mysql user: 'developer' # Required if "mysql root password" is empty, default is empty. The superuser for the specified database. Can use secrets, too
-        mysql password: 'passwordtoo' # Required if "mysql user" exists. The password for the "mysql user"
-    - name: Sleep 15 seconds
-      run: sleep 15
-    - uses: getong/rabbitmq-action@v1.2
-      with:
-        rabbitmq version: '3.8.9-management'
-        host port: 5672
-        rabbitmq user: 'admin'
-        rabbitmq password: 'password'
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 5.0.100
-    - name: Use Node.js
-      uses: actions/setup-node@v1
-      with:
-        node-version: '14.16.1'
-    - name: 'Preparing Frontend checkout'
-      uses: actions/checkout@v2
-      with:
-        repository: microting/eform-angular-frontend
-        ref: stable
-        path: eform-angular-frontend
-    - name: 'Preparing workflow checkout'
-      uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-        repository: microting/eform-angular-workflow-plugin
-        ref: stable
-        path: eform-angular-workflow-plugin
-    - name: Install dependencies
-      run: dotnet restore eform-angular-workflow-plugin/eFormAPI/Plugins/Workflow.Pn/Workflow.Pn.sln
-    - name: Get the version
-      id: get_version
-      run: echo ::set-output name=VERSION::$(echo $GITHUB_REF | cut -d / -f 3 | cut -d "v" -f 2)
-    - name: Build
-      run: dotnet build eform-angular-workflow-plugin/eFormAPI/Plugins/Workflow.Pn/Workflow.Pn.sln
-    - name: Unit Tests
-      run: dotnet test --no-restore -c Release -v n eform-angular-workflow-plugin/eFormAPI/Plugins/Workflow.Pn/Workflow.Pn.Test/Workflow.Pn.Test.csproj
-    - name: Sleep 15 seconds
-      run: sleep 15
-    - name: Load DB dump
-      run: |
-        mysql -u root -h 127.0.0.1 --password=secretpassword -e 'create database `420_eform-angular-workflow-plugin`'
-        mysql -u root -h 127.0.0.1 --password=secretpassword 420_eform-angular-workflow-plugin < eform-angular-workflow-plugin/420_eform-angular-workflow-plugin.sql
-    - name: Copy dependencies
-      run: |
-        cp -av eform-angular-workflow-plugin/eform-client/src/app/plugins/modules/workflow-pn eform-angular-frontend/eform-client/src/app/plugins/modules/workflow-pn
-        cp -av eform-angular-workflow-plugin/eform-client/e2e/Tests/workflow-settings eform-angular-frontend/eform-client/e2e/Tests/workflow-settings
-        cp -av eform-angular-workflow-plugin/eform-client/e2e/Tests/workflow-general eform-angular-frontend/eform-client/e2e/Tests/workflow-general
-        cp -av eform-angular-workflow-plugin/eform-client/e2e/Page\ objects/Workflow eform-angular-frontend/eform-client/e2e/Page\ objects/Workflow
-        cp -av eform-angular-workflow-plugin/eform-client/wdio-headless-plugin-step2.conf.js eform-angular-frontend/eform-client/wdio-headless-plugin-step2.conf.js
-        cp -av eform-angular-workflow-plugin/eform-client/wdio-plugin-step2.conf.js eform-angular-frontend/eform-client/wdio-plugin-step2.conf.js
-        mkdir -p eform-angular-frontend/eFormAPI/eFormAPI.Web/Plugins
-        cp -av eform-angular-workflow-plugin/eFormAPI/eFormAPI.Web/Plugins/Workflow eform-angular-frontend/eFormAPI/eFormAPI.Web/Plugins/Workflow
-        cd eform-angular-frontend/eform-client && ../../eform-angular-workflow-plugin/testinginstallpn.sh
-    - name: Build frontend
-      run: dotnet build eform-angular-frontend/eFormAPI/eFormAPI.sln
-    - name: NPM install
-      run: cd eform-angular-frontend/eform-client && npm install
-    - name: NPM start
-      run: cd eform-angular-frontend/eform-client && npm start > npm_log 2>&1 &
-    - name: Sleep 75 seconds
-      run: sleep 75
-    - name: Dotnet run
-      run: dotnet run --project eform-angular-frontend/eFormAPI/eFormAPI.Web/eFormAPI.Web.csproj > dotnet_log 2>&1 &
-    - name: Sleep 75 seconds
-      run: sleep 75
-    - name: Configuration testing
-      run: cd eform-angular-frontend/eform-client && npm run testheadless
-    - name: Plugin testing
-      run: cd eform-angular-frontend/eform-client && npm run testheadlessplugin
-    - name: The job has failed
-      if: ${{ failure() }}
-      run: |
-        cat dotnet_log
-        cat eform-angular-frontend/eform-client/npm_log
-        mysql -u root --password=secretpassword -e "show databases" -h localhost
-  work-order-build:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        path: main
-    - name: Upgrade Chrome browser
-      run: |
-        sudo apt-get update
-        sudo apt-get --only-upgrade install google-chrome-stable
-        google-chrome --version
-    - uses: getong/mariadb-action@v1.1
-      with:
-        host port: 3306 # Optional, default value is 3306. The port of host
-        container port: 3306 # Optional, default value is 3306. The port of container
-        character set server: 'utf8' # Optional, default value is 'utf8mb4'. The '--character-set-server' option for mysqld
-        collation server: 'utf8_general_ci' # Optional, default value is 'utf8mb4_general_ci'. The '--collation-server' option for mysqld
-        mariadb version: '10.4.10' # Optional, default value is "latest". The version of the MariaDB
-        mysql database: 'some_test' # Optional, default value is "test". The specified database which will be create
-        mysql root password: 'secretpassword' # Required if "mysql user" is empty, default is empty. The root superuser password
-        mysql user: 'developer' # Required if "mysql root password" is empty, default is empty. The superuser for the specified database. Can use secrets, too
-        mysql password: 'passwordtoo' # Required if "mysql user" exists. The password for the "mysql user"
-    - name: Sleep 15 seconds
-      run: sleep 15
-    - uses: getong/rabbitmq-action@v1.2
-      with:
-        rabbitmq version: '3.8.9-management'
-        host port: 5672
-        rabbitmq user: 'admin'
-        rabbitmq password: 'password'
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 5.0.100
-    - name: Use Node.js
-      uses: actions/setup-node@v1
-      with:
-        node-version: '14.16.1'
-    - name: 'Preparing Frontend checkout'
-      uses: actions/checkout@v2
-      with:
-        repository: microting/eform-angular-frontend
-        ref: stable
-        path: eform-angular-frontend
-    - name: 'Preparing work order checkout'
-      uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-        repository: microting/eform-angular-work-orders-plugin
-        ref: stable
-        path: eform-angular-work-orders-plugin
-    - name: Install dependencies
-      run: dotnet restore eform-angular-work-orders-plugin/eFormAPI/Plugins/WorkOrders.Pn/WorkOrders.Pn.sln
-    - name: Get the version
-      id: get_version
-      run: echo ::set-output name=VERSION::$(echo $GITHUB_REF | cut -d / -f 3 | cut -d "v" -f 2)
-    - name: Build
-      run: dotnet build eform-angular-work-orders-plugin/eFormAPI/Plugins/WorkOrders.Pn/WorkOrders.Pn.sln
-    - name: Unit Tests
-      run: dotnet test --no-restore -c Release -v n eform-angular-work-orders-plugin/eFormAPI/Plugins/WorkOrders.Pn/WorkOrders.Pn.Test/WorkOrders.Pn.Test.csproj
-    - name: Sleep 15
-      run: sleep 15
-    - name: Load DB dump
-      run: |
-        mysql -u root -h 127.0.0.1 --password=secretpassword -e 'create database `420_eform-angular-work-orders-plugin`'
-        mysql -u root -h 127.0.0.1 --password=secretpassword -e 'create database `420_SDK`'
-        mysql -u root -h 127.0.0.1 --password=secretpassword 420_eform-angular-work-orders-plugin < eform-angular-work-orders-plugin/420_eform-angular-work-orders-plugin.sql
-        mysql -u root -h 127.0.0.1 --password=secretpassword 420_SDK < eform-angular-work-orders-plugin/420_SDK.sql
-    - name: Copy dependencies
-      run: |
-        cp -av eform-angular-work-orders-plugin/eform-client/src/app/plugins/modules/workorders-pn eform-angular-frontend/eform-client/src/app/plugins/modules/workorders-pn
-        cp -av eform-angular-work-orders-plugin/eform-client/e2e/Tests/workorders-settings eform-angular-frontend/eform-client/e2e/Tests/workorders-settings
-        cp -av eform-angular-work-orders-plugin/eform-client/e2e/Tests/workorders-general eform-angular-frontend/eform-client/e2e/Tests/workorders-general
-        cp -av eform-angular-work-orders-plugin/eform-client/e2e/Page\ objects/WorkOrders eform-angular-frontend/eform-client/e2e/Page\ objects/WorkOrders
-        cp -av eform-angular-work-orders-plugin/eform-client/wdio-headless-plugin-step2.conf.js eform-angular-frontend/eform-client/wdio-headless-plugin-step2.conf.js
-        cp -av eform-angular-work-orders-plugin/eform-client/wdio-plugin-step2.conf.js eform-angular-frontend/eform-client/wdio-plugin-step2.conf.js
-        mkdir -p eform-angular-frontend/eFormAPI/eFormAPI.Web/Plugins
-        cp -av eform-angular-work-orders-plugin/eFormAPI/eFormAPI.Web/Plugins/WorkOrders eform-angular-frontend/eFormAPI/eFormAPI.Web/Plugins/WorkOrders
-        cd eform-angular-frontend/eform-client && ../../eform-angular-work-orders-plugin/testinginstallpn.sh
-    - name: Build frontend
-      run: dotnet build eform-angular-frontend/eFormAPI/eFormAPI.sln > dotnet_log 2>&1 &
-    - name: NPM install
-      run: cd eform-angular-frontend/eform-client && npm install
-    - name: NPM start
-      run: cd eform-angular-frontend/eform-client && npm start > npm_log 2>&1 &
-    - name: Sleep 75 seconds
-      run: sleep 75
-    - name: Dotnet run
-      run: dotnet run --project eform-angular-frontend/eFormAPI/eFormAPI.Web/eFormAPI.Web.csproj > dotnet_log 2>&1 &
-    - name: Sleep 75 seconds
-      run: sleep 75
-    - name: Configuration testing
-      run: cd eform-angular-frontend/eform-client && npm run testheadless
-    - name: Plugin testing
-      run: cd eform-angular-frontend/eform-client && npm run testheadlessplugin
-  backend-pn-build:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        path: main
-    - name: Upgrade Chrome browser
-      run: |
-        sudo apt-get update
-        sudo apt-get --only-upgrade install google-chrome-stable
-        google-chrome --version
-    - uses: getong/mariadb-action@v1.1
-      with:
-        host port: 3306 # Optional, default value is 3306. The port of host
-        container port: 3306 # Optional, default value is 3306. The port of container
-        character set server: 'utf8' # Optional, default value is 'utf8mb4'. The '--character-set-server' option for mysqld
-        collation server: 'utf8_general_ci' # Optional, default value is 'utf8mb4_general_ci'. The '--collation-server' option for mysqld
-        mariadb version: '10.4.10' # Optional, default value is "latest". The version of the MariaDB
-        mysql database: 'some_test' # Optional, default value is "test". The specified database which will be create
-        mysql root password: 'secretpassword' # Required if "mysql user" is empty, default is empty. The root superuser password
-        mysql user: 'developer' # Required if "mysql root password" is empty, default is empty. The superuser for the specified database. Can use secrets, too
-        mysql password: 'passwordtoo' # Required if "mysql user" exists. The password for the "mysql user"
-    - name: Sleep 15 seconds
-      run: sleep 15
-    - uses: getong/rabbitmq-action@v1.2
-      with:
-        rabbitmq version: '3.8.9-management'
-        host port: 5672
-        rabbitmq user: 'admin'
-        rabbitmq password: 'password'
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 5.0.100
-    - name: Use Node.js
-      uses: actions/setup-node@v1
-      with:
-        node-version: '14.16.1'
-    - name: 'Preparing Frontend checkout'
-      uses: actions/checkout@v2
-      with:
-        repository: microting/eform-angular-frontend
-        ref: stable
-        path: eform-angular-frontend
-    - name: 'Preparing work order checkout'
-      uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-        repository: microting/eform-backendconfiguration-plugin
-        ref: stable
-        path: eform-backendconfiguration-plugin
-    - name: 'Preparing ItemsPlanning checkout'
-      uses: actions/checkout@v2
-      with:
-        repository: microting/eform-angular-items-planning-plugin
-        ref: ${{ steps.extract_branch.outputs.branch }}
-        path: eform-angular-items-planning-plugin
-    - name: Install dependencies
-      run: dotnet restore eform-backendconfiguration-plugin/eFormAPI/Plugins/BackendConfiguration.Pn/BackendConfiguration.Pn.sln
-    - name: Get the version
-      id: get_version
-      run: echo ::set-output name=VERSION::$(echo $GITHUB_REF | cut -d / -f 3 | cut -d "v" -f 2)
-    - name: Build
-      run: dotnet build eform-backendconfiguration-plugin/eFormAPI/Plugins/BackendConfiguration.Pn/BackendConfiguration.Pn.sln
-    - name: Build ItemsPlanning
-      run: dotnet build eform-angular-items-planning-plugin/eFormAPI/Plugins/ItemsPlanning.Pn/ItemsPlanning.Pn.sln
-    - name: Unit Tests
-      run: dotnet test --no-restore -c Release -v n eform-backendconfiguration-plugin/eFormAPI/Plugins/BackendConfiguration.Pn/BackendConfiguration.Pn.Test/BackendConfiguration.Pn.Test.csproj
-    - name: Sleep 15
-      run: sleep 15
-    - name: Copy dependencies
-      run: |
-        cp -av eform-angular-items-planning-plugin/eform-client/src/app/plugins/modules/items-planning-pn eform-angular-frontend/eform-client/src/app/plugins/modules/items-planning-pn
-        cp -av eform-backendconfiguration-plugin/eform-client/src/app/plugins/modules/backend-configuration-pn eform-angular-frontend/eform-client/src/app/plugins/modules/backend-configuration-pn
-        cp -av eform-backendconfiguration-plugin/eform-client/e2e/Tests/backend-configuration-settings eform-angular-frontend/eform-client/e2e/Tests/backend-configuration-settings
-        cp -av eform-backendconfiguration-plugin/eform-client/e2e/Tests/backend-configuration-general eform-angular-frontend/eform-client/e2e/Tests/backend-configuration-general
-        cp -av eform-backendconfiguration-plugin/eform-client/e2e/Page\ objects/BackendConfiguration eform-angular-frontend/eform-client/e2e/Page\ objects/BackendConfiguration
-        cp -av eform-angular-items-planning-plugin/eform-client/e2e/Page\ objects/ItemsPlanning eform-angular-frontend/eform-client/e2e/Page\ objects/ItemsPlanning
-        cp -av eform-backendconfiguration-plugin/eform-client/wdio-headless-plugin-step2.conf.js eform-angular-frontend/eform-client/wdio-headless-plugin-step2.conf.js
-        cp -av eform-backendconfiguration-plugin/eform-client/wdio-plugin-step2.conf.js eform-angular-frontend/eform-client/wdio-plugin-step2.conf.js
-        mkdir -p eform-angular-frontend/eFormAPI/eFormAPI.Web/Plugins
-        cp -av eform-angular-items-planning-plugin/eFormAPI/eFormAPI.Web/Plugins/ItemsPlanning eform-angular-frontend/eFormAPI/eFormAPI.Web/Plugins/ItemsPlanning
-        cp -av eform-backendconfiguration-plugin/eFormAPI/eFormAPI.Web/Plugins/BackendConfiguration.Pn eform-angular-frontend/eFormAPI/eFormAPI.Web/Plugins/BackendConfiguration.Pn
-        cd eform-angular-frontend/eform-client && ../../eform-backendconfiguration-plugin/testinginstallpn.sh
-        ../../eform-angular-items-planning-plugin/testinginstallpn.sh
-    - name: Build frontend
-      run: dotnet build eform-angular-frontend/eFormAPI/eFormAPI.sln > dotnet_log 2>&1 &
     - name: NPM install
       run: cd eform-angular-frontend/eform-client && npm install
     - name: NPM start
@@ -475,23 +179,23 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 5.0.100
+        dotnet-version: 6.0.x
     - name: Install dependencies
       run: dotnet restore eform-debian-service
     - name: Build
       run: dotnet build --configuration Release --no-restore eform-debian-service
     - name: Test
       run: dotnet test --no-restore --verbosity normal eform-debian-service
-  work-order-service-build:
+  outer-inner-resource-service-build:
     runs-on: ubuntu-latest
     steps:
-    - name: 'Preparing eform-service-workorder-plugin checkout'
+    - name: 'Preparing eform-service-outer-inner-resource-plugin checkout'
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-        repository: microting/eform-service-workorder-plugin
+        repository: microting/eform-service-outer-inner-resource-plugin
         ref: stable
-        path: eform-service-workorder-plugin
+        path: eform-service-outer-inner-resource-plugin
     - uses: getong/mariadb-action@v1.1
       with:
         host port: 3306 # Optional, default value is 3306. The port of host
@@ -515,95 +219,15 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 5.0.100
+        dotnet-version: 6.0.x
     - name: Install dependencies
-      run: dotnet restore eform-service-workorder-plugin
+      run: dotnet restore eform-service-outer-inner-resource-plugin
     - name: Build
-      run: dotnet build --configuration Release --no-restore eform-service-workorder-plugin
+      run: dotnet build --configuration Release --no-restore eform-service-outer-inner-resource-plugin
     - name: Unit Tests
-      run: dotnet test --no-restore -c Release -v n eform-service-workorder-plugin/ServiceWorkOrdersPlugin.Integration.Test/ServiceWorkOrdersPlugin.Integration.Test.csproj
-  items-planning-service-build:
-    runs-on: ubuntu-latest
-    steps:
-    - name: 'Preparing eform-service-items-planning-plugin checkout'
-      uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-        repository: microting/eform-service-items-planning-plugin
-        ref: stable
-        path: eform-service-items-planning-plugin
-    - uses: getong/mariadb-action@v1.1
-      with:
-        host port: 3306 # Optional, default value is 3306. The port of host
-        container port: 3306 # Optional, default value is 3306. The port of container
-        character set server: 'utf8' # Optional, default value is 'utf8mb4'. The '--character-set-server' option for mysqld
-        collation server: 'utf8_general_ci' # Optional, default value is 'utf8mb4_general_ci'. The '--collation-server' option for mysqld
-        mariadb version: '10.4.10' # Optional, default value is "latest". The version of the MariaDB
-        mysql database: 'some_test' # Optional, default value is "test". The specified database which will be create
-        mysql root password: 'secretpassword' # Required if "mysql user" is empty, default is empty. The root superuser password
-        mysql user: 'developer' # Required if "mysql root password" is empty, default is empty. The superuser for the specified database. Can use secrets, too
-        mysql password: 'passwordtoo' # Required if "mysql user" exists. The password for the "mysql user"
-    - name: Sleep 15 seconds
-      run: sleep 15
-    - uses: getong/rabbitmq-action@v1.2
-      with:
-        rabbitmq version: '3.8.9-management'
-        host port: 5672
-        rabbitmq user: 'admin'
-        rabbitmq password: 'password'
-        rabbitmq vhost: 'vhost_name'
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 5.0.100
-    - name: Install dependencies
-      run: dotnet restore eform-service-items-planning-plugin
-    - name: Build
-      run: dotnet build --configuration Release --no-restore eform-service-items-planning-plugin
-    - name: Unit Tests
-      run: dotnet test --no-restore -c Release -v n eform-service-items-planning-plugin/ServiceItemsPlanningPlugin.Integration.Test/ServiceItemsPlanningPlugin.Integration.Test.csproj
-  workflow-service-build:
-    runs-on: ubuntu-latest
-    steps:
-    - name: 'Preparing eform-service-workorder-plugin checkout'
-      uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-        repository: microting/eform-service-workflow-plugin
-        ref: stable
-        path: eform-service-workflow-plugin
-    - uses: getong/mariadb-action@v1.1
-      with:
-        host port: 3306 # Optional, default value is 3306. The port of host
-        container port: 3306 # Optional, default value is 3306. The port of container
-        character set server: 'utf8' # Optional, default value is 'utf8mb4'. The '--character-set-server' option for mysqld
-        collation server: 'utf8_general_ci' # Optional, default value is 'utf8mb4_general_ci'. The '--collation-server' option for mysqld
-        mariadb version: '10.4.10' # Optional, default value is "latest". The version of the MariaDB
-        mysql database: 'some_test' # Optional, default value is "test". The specified database which will be create
-        mysql root password: 'secretpassword' # Required if "mysql user" is empty, default is empty. The root superuser password
-        mysql user: 'developer' # Required if "mysql root password" is empty, default is empty. The superuser for the specified database. Can use secrets, too
-        mysql password: 'passwordtoo' # Required if "mysql user" exists. The password for the "mysql user"
-    - name: Sleep 15 seconds
-      run: sleep 15
-    - uses: getong/rabbitmq-action@v1.2
-      with:
-        rabbitmq version: '3.8.9-management'
-        host port: 5672
-        rabbitmq user: 'admin'
-        rabbitmq password: 'password'
-        rabbitmq vhost: 'vhost_name'
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 5.0.100
-    - name: Install dependencies
-      run: dotnet restore eform-service-workflow-plugin
-    - name: Build
-      run: dotnet build --configuration Release --no-restore eform-service-workflow-plugin
-    - name: Unit Tests
-      run: dotnet test --no-restore -c Release -v n eform-service-workflow-plugin/ServiceWorkflowPlugin.Integration.Test/ServiceWorkflowPlugin.Integration.Test.csproj
+      run: dotnet test --no-restore -c Release -v n eform-service-outer-inner-resource-plugin/ServiceOuterInnerResourcePlugin.Integration.Test/ServiceOuterInnerResourcePlugin.Integration.Test.csproj
   deploy:
-    needs: [frontend-build, items-planning-build, work-order-build, backend-pn-build, service-build, work-order-service-build, items-planning-service-build, workflow-build, workflow-service-build]
+    needs: [frontend-build, outer-inner-resource-build, service-build, outer-inner-resource-service-build]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -620,16 +244,16 @@ jobs:
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-        repository: microting/eform-angular-items-planning-plugin
+        repository: microting/eform-angular-outer-inner-resource-plugin
         ref: stable
-        path: eform-angular-items-planning-plugin
+        path: eform-angular-outer-inner-resource-plugin
     - name: 'Preparing work order checkout'
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-        repository: microting/eform-angular-work-orders-plugin
+        repository: microting/eform-angular-outer-inner-resource-plugin
         ref: stable
-        path: eform-angular-work-orders-plugin
+        path: eform-angular-outer-inner-resource-plugin
     - name: 'Preparing workflow checkout'
       uses: actions/checkout@v2
       with:
@@ -646,30 +270,15 @@ jobs:
         path: eform-backendconfiguration-plugin
     - name: Copy dependencies
       run: |
-        cp -av eform-angular-work-orders-plugin/eform-client/src/app/plugins/modules/workorders-pn eform-angular-frontend/eform-client/src/app/plugins/modules/workorders-pn
-        cp -av eform-angular-workflow-plugin/eform-client/src/app/plugins/modules/workflow-pn eform-angular-frontend/eform-client/src/app/plugins/modules/workflow-pn
-        cp -av eform-angular-items-planning-plugin/eform-client/src/app/plugins/modules/items-planning-pn eform-angular-frontend/eform-client/src/app/plugins/modules/items-planning-pn
-        cp -av eform-backendconfiguration-plugin/eform-client/src/app/plugins/modules/backend-configuration-pn eform-angular-frontend/eform-client/src/app/plugins/modules/backend-configuration-pn
+        cp -av eform-angular-outer-inner-resource-plugin/eform-client/src/app/plugins/modules/outer-inner-resource-pn eform-angular-frontend/eform-client/src/app/plugins/modules/outer-inner-resource-pn
         mkdir -p eform-angular-frontend/eFormAPI/eFormAPI.Web/Plugins
-        cd eform-angular-frontend/eform-client && ../../eform-angular-items-planning-plugin/testinginstallpn.sh
-        ../../eform-angular-work-orders-plugin/testinginstallpn.sh
-        ../../eform-angular-workflow-plugin/testinginstallpn.sh
-        ../../eform-backendconfiguration-plugin/testinginstallpn.sh
+        cd eform-angular-frontend/eform-client && ../../eform-angular-outer-inner-resource-plugin/testinginstallpn.sh
     - name: Get the version release
       id: get_release_version
       run: echo ::set-output name=VERSION::$(cd main && git describe --abbrev=0 --tags | cut -d "v" -f 2)
     - name: Get the version
       id: get_version
-      run: echo ::set-output name=VERSION::$(cd eform-angular-items-planning-plugin && git describe --abbrev=0 --tags | cut -d "v" -f 2)
-    - name: Get the work order version
-      id: get_plugin_version
-      run: echo ::set-output name=PLUGIN2VERSION::$(cd eform-angular-work-orders-plugin && git describe --abbrev=0 --tags | cut -d "v" -f 2)
-    - name: Get the work order version
-      id: get_plugin3_version
-      run: echo ::set-output name=PLUGIN3VERSION::$(cd eform-angular-workflow-plugin && git describe --abbrev=0 --tags | cut -d "v" -f 2)
-    - name: Get the work order version
-      id: get_plugin4_version
-      run: echo ::set-output name=PLUGIN4VERSION::$(cd eform-backendconfiguration-plugin && git describe --abbrev=0 --tags | cut -d "v" -f 2)
+      run: echo ::set-output name=VERSION::$(cd eform-angular-outer-inner-resource-plugin && git describe --abbrev=0 --tags | cut -d "v" -f 2)
     - name: Get the frontend version
       id: get_frontend_version
       run: echo ::set-output name=FRONTENDVERSION::$(cd eform-angular-frontend && git describe --abbrev=0 --tags | cut -d "v" -f 2)
@@ -682,19 +291,19 @@ jobs:
         username: renemadsen
         password: zd8237EA
     - name: Build the tagged Docker image
-      run: docker build . -t microtingas/work-items-planning-container:latest -t microtingas/work-items-planning-container:${{ steps.get_release_version.outputs.VERSION }} --build-arg GITVERSION=${{ steps.get_frontend_version.outputs.FRONTENDVERSION }} --build-arg PLUGINVERSION=${{ steps.get_version.outputs.VERSION }} --build-arg PLUGIN2VERSION=${{ steps.get_plugin_version.outputs.PLUGIN2VERSION }} --build-arg PLUGIN3VERSION=${{ steps.get_plugin3_version.outputs.PLUGIN3VERSION }} --build-arg PLUGIN4VERSION=${{ steps.get_plugin4_version.outputs.PLUGIN4VERSION }}
+      run: docker build . -t microtingas/outer-inner-resource-container:latest -t microtingas/outer-inner-resource-container:${{ steps.get_release_version.outputs.VERSION }} --build-arg GITVERSION=${{ steps.get_frontend_version.outputs.FRONTENDVERSION }} --build-arg PLUGINVERSION=${{ steps.get_version.outputs.VERSION }}
     - name: Tag builds
       run: |-
-        docker tag microtingas/work-items-planning-container:latest registry.microting.com/microtingas/work-items-planning-container:latest
-        docker tag microtingas/work-items-planning-container:${{ steps.get_release_version.outputs.VERSION }} registry.microting.com/microtingas/work-items-planning-container:${{ steps.get_release_version.outputs.VERSION }}
+        docker tag microtingas/outer-inner-resource-container:latest registry.microting.com/microtingas/outer-inner-resource-container:latest
+        docker tag microtingas/outer-inner-resource-container:${{ steps.get_release_version.outputs.VERSION }} registry.microting.com/microtingas/outer-inner-resource-container:${{ steps.get_release_version.outputs.VERSION }}
     - name: Push the tagged Docker image
-      run: docker push registry.microting.com/microtingas/work-items-planning-container:${{ steps.get_release_version.outputs.VERSION }}
+      run: docker push registry.microting.com/microtingas/outer-inner-resource-container:${{ steps.get_release_version.outputs.VERSION }}
     - name: Push the latest Docker image
-      run: docker push registry.microting.com/microtingas/work-items-planning-container:latest
+      run: docker push registry.microting.com/microtingas/outer-inner-resource-container:latest
     - name: Image digest
       run: echo ${{ steps.docker_build.outputs.digest }}
   deploy-service:
-    needs: [frontend-build, items-planning-build, work-order-build, backend-pn-build, service-build, work-order-service-build, items-planning-service-build, workflow-build, workflow-service-build]
+    needs: [frontend-build, outer-inner-resource-build, service-build, outer-inner-resource-service-build]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -711,35 +320,15 @@ jobs:
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-        repository: microting/eform-service-items-planning-plugin
+        repository: microting/eform-service-outer-inner-resource-plugin
         ref: stable
-        path: eform-service-items-planning-plugin
-    - name: 'Preparing work order checkout'
-      uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-        repository: microting/eform-service-workorder-plugin
-        ref: stable
-        path: eform-service-workorder-plugin
-    - name: 'Preparing workflow checkout'
-      uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-        repository: microting/eform-service-workflow-plugin
-        ref: stable
-        path: eform-service-workflow-plugin
+        path: eform-service-outer-inner-resource-plugin
     - name: Get the version release
       id: get_release_version
       run: echo ::set-output name=VERSION::$(cd main && git describe --abbrev=0 --tags | cut -d "v" -f 2)
     - name: Get the version
       id: get_version
-      run: echo ::set-output name=VERSION::$(cd eform-service-items-planning-plugin && git describe --abbrev=0 --tags | cut -d "v" -f 2)
-    - name: Get the work order version
-      id: get_plugin_version
-      run: echo ::set-output name=PLUGIN2VERSION::$(cd eform-service-workorder-plugin && git describe --abbrev=0 --tags | cut -d "v" -f 2)
-    - name: Get the workflow version
-      id: get_plugin3_version
-      run: echo ::set-output name=PLUGIN3VERSION::$(cd eform-service-workflow-plugin && git describe --abbrev=0 --tags | cut -d "v" -f 2)
+      run: echo ::set-output name=VERSION::$(cd eform-service-outer-inner-resource-plugin && git describe --abbrev=0 --tags | cut -d "v" -f 2)
     - name: Get the service version
       id: get_service_version
       run: echo ::set-output name=FRONTENDVERSION::$(cd eform-debian-service && git describe --abbrev=0 --tags | cut -d "v" -f 2)
@@ -752,14 +341,14 @@ jobs:
         username: renemadsen
         password: zd8237EA
     - name: Build the tagged Docker image
-      run: docker build . -t microtingas/work-items-planning-service-container:latest -t microtingas/work-items-planning-service-container:${{ steps.get_release_version.outputs.VERSION }} --build-arg GITVERSION=${{ steps.get_service_version.outputs.FRONTENDVERSION }} --build-arg PLUGINVERSION=${{ steps.get_version.outputs.VERSION }} --build-arg PLUGIN2VERSION=${{ steps.get_plugin_version.outputs.PLUGIN2VERSION }} --build-arg PLUGIN3VERSION=${{ steps.get_plugin3_version.outputs.PLUGIN3VERSION }}
+      run: docker build . -t microtingas/outer-inner-resource-service-container:latest -t microtingas/outer-inner-resource-service-container:${{ steps.get_release_version.outputs.VERSION }} --build-arg GITVERSION=${{ steps.get_service_version.outputs.FRONTENDVERSION }} --build-arg PLUGINVERSION=${{ steps.get_version.outputs.VERSION }}
     - name: Tag builds
       run: |-
-        docker tag microtingas/work-items-planning-service-container:latest registry.microting.com/microtingas/work-items-planning-service-container:latest
-        docker tag microtingas/work-items-planning-service-container:${{ steps.get_release_version.outputs.VERSION }} registry.microting.com/microtingas/work-items-planning-service-container:${{ steps.get_release_version.outputs.VERSION }}
+        docker tag microtingas/outer-inner-resource-service-container:latest registry.microting.com/microtingas/outer-inner-resource-service-container:latest
+        docker tag microtingas/outer-inner-resource-service-container:${{ steps.get_release_version.outputs.VERSION }} registry.microting.com/microtingas/outer-inner-resource-service-container:${{ steps.get_release_version.outputs.VERSION }}
     - name: Push the tagged Docker image
-      run: docker push registry.microting.com/microtingas/work-items-planning-service-container:${{ steps.get_release_version.outputs.VERSION }}
+      run: docker push registry.microting.com/microtingas/outer-inner-resource-service-container:${{ steps.get_release_version.outputs.VERSION }}
     - name: Push the latest Docker image
-      run: docker push registry.microting.com/microtingas/work-items-planning-service-container:latest
+      run: docker push registry.microting.com/microtingas/outer-inner-resource-service-container:latest
     - name: Image digest
       run: echo ${{ steps.docker_build.outputs.digest }}

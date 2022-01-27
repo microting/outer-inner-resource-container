@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   registry: registry.microting.com
-  repository: registry.microting.com/microtingas/work-items-planning-service-container
+  repository: registry.microting.com/microtingas/outer-inner-resource-service-container
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
