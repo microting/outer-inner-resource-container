@@ -35,7 +35,7 @@ jobs:
       run: sleep 15
     - uses: getong/rabbitmq-action@v1.2
       with:
-        rabbitmq version: '3.8.2-management-alpine'
+        rabbitmq version: '3.8.9-management'
         host port: 5672
         rabbitmq user: 'admin'
         rabbitmq password: 'password'
@@ -148,7 +148,7 @@ jobs:
         cp -av eform-angular-outer-inner-resource-plugin/eform-client/wdio-headless-plugin-step2.conf.js eform-angular-frontend/eform-client/wdio-headless-plugin-step2.conf.js
         cp -av eform-angular-outer-inner-resource-plugin/eform-client/wdio-plugin-step2.conf.js eform-angular-frontend/eform-client/wdio-plugin-step2.conf.js
         mkdir -p eform-angular-frontend/eFormAPI/eFormAPI.Web/Plugins
-        cp -av eform-angular-outer-inner-resource-plugin/eFormAPI/eFormAPI.Web/Plugins/OuterInnerResource eform-angular-frontend/eFormAPI/eFormAPI.Web/Plugins/OuterInnerResource
+        cp -av eform-angular-outer-inner-resource-plugin/eFormAPI/eFormAPI.Web/Plugins/OuterInnerResource.Pn eform-angular-frontend/eFormAPI/eFormAPI.Web/Plugins/OuterInnerResource.Pn
         cd eform-angular-frontend/eform-client && ../../eform-angular-outer-inner-resource-plugin/testinginstallpn.sh
     - name: Build frontend
       run: dotnet build eform-angular-frontend/eFormAPI/eFormAPI.sln
