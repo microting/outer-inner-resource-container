@@ -285,21 +285,20 @@ jobs:
     - name: Copy frontendfiles
       run: cp main/Dockerfile .
     - name: Login to DockerHub
-      uses: docker/login-action@v1
+      uses: docker/login-action@v2
       with:
-        registry: registry.microting.com
-        username: renemadsen
-        password: zd8237EA
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
     - name: Build the tagged Docker image
       run: docker build . -t microtingas/outer-inner-resource-container:latest -t microtingas/outer-inner-resource-container:${{ steps.get_release_version.outputs.VERSION }} --build-arg GITVERSION=${{ steps.get_frontend_version.outputs.FRONTENDVERSION }} --build-arg PLUGINVERSION=${{ steps.get_version.outputs.VERSION }}
     - name: Tag builds
       run: |-
-        docker tag microtingas/outer-inner-resource-container:latest registry.microting.com/microtingas/outer-inner-resource-container:latest
-        docker tag microtingas/outer-inner-resource-container:${{ steps.get_release_version.outputs.VERSION }} registry.microting.com/microtingas/outer-inner-resource-container:${{ steps.get_release_version.outputs.VERSION }}
+        docker tag microtingas/outer-inner-resource-container:latest microtingas/outer-inner-resource-container:latest
+        docker tag microtingas/outer-inner-resource-container:${{ steps.get_release_version.outputs.VERSION }} microtingas/outer-inner-resource-container:${{ steps.get_release_version.outputs.VERSION }}
     - name: Push the tagged Docker image
-      run: docker push registry.microting.com/microtingas/outer-inner-resource-container:${{ steps.get_release_version.outputs.VERSION }}
+      run: docker push microtingas/outer-inner-resource-container:${{ steps.get_release_version.outputs.VERSION }}
     - name: Push the latest Docker image
-      run: docker push registry.microting.com/microtingas/outer-inner-resource-container:latest
+      run: docker push microtingas/outer-inner-resource-container:latest
     - name: Image digest
       run: echo ${{ steps.docker_build.outputs.digest }}
   deploy-service:
@@ -335,20 +334,19 @@ jobs:
     - name: Copy Docker file
       run: cp main/Dockerfile-service Dockerfile
     - name: Login to DockerHub
-      uses: docker/login-action@v1
+      uses: docker/login-action@v2
       with:
-        registry: registry.microting.com
-        username: renemadsen
-        password: zd8237EA
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
     - name: Build the tagged Docker image
       run: docker build . -t microtingas/outer-inner-resource-service-container:latest -t microtingas/outer-inner-resource-service-container:${{ steps.get_release_version.outputs.VERSION }} --build-arg GITVERSION=${{ steps.get_service_version.outputs.FRONTENDVERSION }} --build-arg PLUGINVERSION=${{ steps.get_version.outputs.VERSION }}
     - name: Tag builds
       run: |-
-        docker tag microtingas/outer-inner-resource-service-container:latest registry.microting.com/microtingas/outer-inner-resource-service-container:latest
-        docker tag microtingas/outer-inner-resource-service-container:${{ steps.get_release_version.outputs.VERSION }} registry.microting.com/microtingas/outer-inner-resource-service-container:${{ steps.get_release_version.outputs.VERSION }}
+        docker tag microtingas/outer-inner-resource-service-container:latest microtingas/outer-inner-resource-service-container:latest
+        docker tag microtingas/outer-inner-resource-service-container:${{ steps.get_release_version.outputs.VERSION }} microtingas/outer-inner-resource-service-container:${{ steps.get_release_version.outputs.VERSION }}
     - name: Push the tagged Docker image
-      run: docker push registry.microting.com/microtingas/outer-inner-resource-service-container:${{ steps.get_release_version.outputs.VERSION }}
+      run: docker push microtingas/outer-inner-resource-service-container:${{ steps.get_release_version.outputs.VERSION }}
     - name: Push the latest Docker image
-      run: docker push registry.microting.com/microtingas/outer-inner-resource-service-container:latest
+      run: docker push microtingas/outer-inner-resource-service-container:latest
     - name: Image digest
       run: echo ${{ steps.docker_build.outputs.digest }}
