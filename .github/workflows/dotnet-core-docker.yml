@@ -418,6 +418,16 @@ jobs:
     - uses: actions/checkout@v3
       with:
         path: main
+    - name: Create docker network 🖧
+      run: docker network create --driver bridge data
+    - name: Start MariaDB
+      run: |
+        docker pull mariadb:10.8
+        docker run --name mariadbtest --network data -e MYSQL_ROOT_PASSWORD=secretpassword -p 3306 -d mariadb:10.8
+    - name: Start rabbitmq
+      run: |
+        docker pull rabbitmq:latest
+        docker run -d --hostname my-rabbit --name some-rabbit --network data -e RABBITMQ_DEFAULT_USER=admin -e RABBITMQ_DEFAULT_PASS=password rabbitmq:latest
     - name: 'Preparing Frontend checkout'
       uses: actions/checkout@v3
       with:
@@ -432,6 +442,14 @@ jobs:
         repository: microting/eform-service-outer-inner-resource-plugin
         ref: stable
         path: eform-service-outer-inner-resource-plugin
+    - name: Load DB dump
+      run: |
+        docker exec -i mariadbtest mysql -u root --password=secretpassword -e 'create database `420_SDK`'
+        docker exec -i mariadbtest mysql -u root --password=secretpassword 420_SDK < main/420_SDK.sql
+        docker exec -i mariadbtest mysql -u root --password=secretpassword -e 'create database `420_Angular`'
+        docker exec -i mariadbtest mysql -u root --password=secretpassword 420_Angular < main/420_Angular.sql
+        docker exec -i mariadbtest mysql -u root --password=secretpassword -e 'create database `420_eform-angular-outer-inner-resource-plugin`'
+        docker exec -i mariadbtest mysql -u root --password=secretpassword 420_eform-angular-outer-inner-resource-plugin < main/420_eform-angular-outer-inner-resource-plugin.sql
     - name: Get the version release
       id: get_release_version
       run: echo ::set-output name=VERSION::$(cd main && git describe --abbrev=0 --tags | cut -d "v" -f 2)
@@ -454,6 +472,20 @@ jobs:
       run: |-
         docker tag microtingas/outer-inner-resource-service-container:latest microtingas/outer-inner-resource-service-container:latest
         docker tag microtingas/outer-inner-resource-service-container:${{ steps.get_release_version.outputs.VERSION }} microtingas/outer-inner-resource-service-container:${{ steps.get_release_version.outputs.VERSION }}
+    - name: Start the newly build Docker container
+      id: docker-run
+      run: docker run --name my-container --network data microtingas/outer-inner-resource-service-container:latest "/ConnectionString=host=mariadbtest;Database=420_SDK;user=root;password=secretpassword;port=3306;Convert Zero Datetime = true;SslMode=none;" > docker_run_log 2>&1 &
+    - name: Sleep 75 seconds for letting the container start and generate some output we can
+      run: sleep 75
+    - name: Get standard output
+      run: cat docker_run_log
+    - name: Stop the newly build Docker container
+      run: docker stop my-container
+    - name: Get standard output
+      run: |
+        cat docker_run_log
+        result=`cat docker_run_log | grep "No messages for us right now!" -m 1 | wc -l`
+        if [ $result -ne 1 ];then exit 1; fi
     - name: Push the tagged Docker image
       run: docker push microtingas/outer-inner-resource-service-container:${{ steps.get_release_version.outputs.VERSION }}
     - name: Push the latest Docker image
