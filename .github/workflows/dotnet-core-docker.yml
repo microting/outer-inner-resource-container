@@ -61,7 +61,7 @@ jobs:
       run: docker network create --driver bridge --attachable data
     - name: Start MariaDB
       run: |
-        docker pull mariadb:latest
+        docker pull mariadb:10.8
         docker run --name mariadbtest --network data -e MYSQL_ROOT_PASSWORD=secretpassword -p 3306:3306 -d mariadb:latest
     - name: Start rabbitmq
       run: |
@@ -70,7 +70,7 @@ jobs:
     - name: Use Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '18.12.1'
+        node-version: 20
     - name: yarn install
       run: cd eform-angular-frontend/eform-client && yarn install
       if: steps.cache.outputs.cache-hit != 'true'
@@ -99,6 +99,7 @@ jobs:
         spec: cypress/e2e/db/*
         config-file: cypress.config.ts
         working-directory: eform-angular-frontend/eform-client
+        command-prefix: "--"
     - name: testheadless2${{matrix.test}}
       run: cd eform-angular-frontend/eform-client && npm run testheadless2${{matrix.test}}
     - name: Stop the newly build Docker container
@@ -112,15 +113,6 @@ jobs:
       if: ${{ failure() }}
       run: |
         cat docker_run_log
-    - name: Notify slack fail
-      if: ${{ failure() }}
-      env:
-        SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-      uses: voxmedia/github-action-slack-notify-build@v1
-      with:
-        channel_id: CC04FGH5K
-        status: ${{matrix.test}} FAILED
-        color: danger
     - name: Archive screenshot artifacts
       if: ${{ failure() }}
       uses: actions/upload-artifact@v3
@@ -146,7 +138,7 @@ jobs:
       run: docker network create --driver bridge --attachable data
     - name: Start MariaDB
       run: |
-        docker pull mariadb:latest
+        docker pull mariadb:10.8
         docker run --name mariadbtest --network data -e MYSQL_ROOT_PASSWORD=secretpassword -p 3306:3306 -d mariadb:latest
     - name: Start rabbitmq
       run: |
@@ -155,7 +147,7 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 7.0.x
+        dotnet-version: 8.0.x
     - name: Install dependencies
       run: dotnet restore eform-angular-frontend/eFormAPI/eFormAPI.sln
     - name: Build
@@ -218,7 +210,7 @@ jobs:
       run: docker network create --driver bridge --attachable data
     - name: Start MariaDB
       run: |
-        docker pull mariadb:latest
+        docker pull mariadb:10.8
         docker run --name mariadbtest --network data -e MYSQL_ROOT_PASSWORD=secretpassword -p 3306:3306 -d mariadb:latest
     - name: Start rabbitmq
       run: |
@@ -232,7 +224,7 @@ jobs:
     - name: Use Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '18.12.1'
+        node-version: 20
     - name: 'Preparing Frontend checkout'
       uses: actions/checkout@v2
       with:
@@ -291,24 +283,15 @@ jobs:
         spec: cypress/e2e/db/*
         config-file: cypress.config.ts
         working-directory: eform-angular-frontend/eform-client
+        command-prefix: "--"
     - name: Change rabbitmq hostname
-      run: docker exec -i mariadbtest mysql -u root --password=secretpassword -e 'update 420_SDK.Settings set Value = "my-rabbit" where Name = "rabbitMqHost"'
+      run: docker exec -i mariadbtest mariadb -u root --password=secretpassword -e 'update 420_SDK.Settings set Value = "my-rabbit" where Name = "rabbitMqHost"'
     - name: Plugin testing
       run: cd eform-angular-frontend/eform-client && npm run testheadlessplugin
     - name: The job has failed
       if: ${{ failure() }}
       run: |
         cat docker_run_log
-    - name: Notify slack fail
-      if: ${{ failure() }}
-      env:
-        SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-      uses: voxmedia/github-action-slack-notify-build@v1
-      with:
-        message_id: ${{ steps.slack.outputs.message_id }}
-        channel_id: C017TF6Q46T
-        status: FAILED
-        color: danger
     - name: Archive screenshot artifacts
       if: ${{ failure() }}
       uses: actions/upload-artifact@v3
@@ -334,14 +317,14 @@ jobs:
       run: docker network create --driver bridge --attachable data
     - name: Start MariaDB
       run: |
-        docker pull mariadb:latest
+        docker pull mariadb:10.8
         docker run --name mariadbtest --network data -e MYSQL_ROOT_PASSWORD=secretpassword -p 3306:3306 -d mariadb:latest
     - name: Sleep 15
       run: sleep 15
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 7.0.x
+        dotnet-version: 8.0.x
     - name: Build
       run: dotnet build eform-angular-outer-inner-resource-plugin/eFormAPI/Plugins/OuterInnerResource.Pn/OuterInnerResource.Pn.sln
     - name: Unit Tests
@@ -359,7 +342,7 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 7.0.x
+        dotnet-version: 8.0.x
     - name: Install dependencies
       run: dotnet restore eform-debian-service
     - name: Build
@@ -423,20 +406,20 @@ jobs:
       run: docker network create --driver bridge data
     - name: Start MariaDB
       run: |
-        docker pull mariadb:latest
-        docker run --name mariadbtest --network data -e MYSQL_ROOT_PASSWORD=secretpassword -p 3306 -d mariadb:latest
+        docker pull mariadb:10.8
+        docker run --name mariadbtest --network data -e MYSQL_ROOT_PASSWORD=secretpassword -p 3306:3306 -d mariadb:latest
     - name: Start rabbitmq
       run: |
         docker pull rabbitmq:latest
         docker run -d --hostname my-rabbit --name some-rabbit --network data -e RABBITMQ_DEFAULT_USER=admin -e RABBITMQ_DEFAULT_PASS=password rabbitmq:latest
     - name: Load DB dump
       run: |
-        docker exec -i mariadbtest mysql -u root --password=secretpassword -e 'create database `420_SDK`'
-        docker exec -i mariadbtest mysql -u root --password=secretpassword 420_SDK < main/420_SDK.sql
-        docker exec -i mariadbtest mysql -u root --password=secretpassword -e 'create database `420_eform-angular-outer-inner-resource-plugin`'
-        docker exec -i mariadbtest mysql -u root --password=secretpassword 420_eform-angular-outer-inner-resource-plugin < main/420_eform-angular-outer-inner-resource-plugin.sql
+        docker exec -i mariadbtest mariadb -u root --password=secretpassword -e 'create database `420_SDK`'
+        docker exec -i mariadbtest mariadb -u root --password=secretpassword 420_SDK < main/420_SDK.sql
+        docker exec -i mariadbtest mariadb -u root --password=secretpassword -e 'create database `420_eform-angular-outer-inner-resource-plugin`'
+        docker exec -i mariadbtest mariadb -u root --password=secretpassword 420_eform-angular-outer-inner-resource-plugin < main/420_eform-angular-outer-inner-resource-plugin.sql
     - name: Change rabbitmq hostname
-      run: docker exec -i mariadbtest mysql -u root --password=secretpassword -e 'update 420_SDK.Settings set Value = "my-rabbit" where Name = "rabbitMqHost"'
+      run: docker exec -i mariadbtest mariadb -u root --password=secretpassword -e 'update 420_SDK.Settings set Value = "my-rabbit" where Name = "rabbitMqHost"'
     - name: Start the newly build Docker container
       id: docker-run
       run: docker run --name my-container --network data microtingas/outer-inner-resource-service-container:latest "/ConnectionString=host=mariadbtest;Database=420_SDK;user=root;password=secretpassword;port=3306;Convert Zero Datetime = true;SslMode=none;" > docker_run_log 2>&1 &
@@ -467,8 +450,8 @@ jobs:
       run: docker network create --driver bridge data
     - name: Start MariaDB
       run: |
-        docker pull mariadb:latest
-        docker run --name mariadbtest --network data -e MYSQL_ROOT_PASSWORD=secretpassword -p 3306 -d mariadb:latest
+        docker pull mariadb:10.8
+        docker run --name mariadbtest --network data -e MYSQL_ROOT_PASSWORD=secretpassword -p 3306:3306 -d mariadb:latest
     - name: Start rabbitmq
       run: |
         docker pull rabbitmq:latest
@@ -483,13 +466,13 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 7.0.x
+        dotnet-version: 8.0.x
     - name: Load DB dump
       run: |
-        docker exec -i mariadbtest mysql -u root --password=secretpassword -e 'create database `420_SDK`'
-        docker exec -i mariadbtest mysql -u root --password=secretpassword 420_SDK < main/420_SDK.sql
-        docker exec -i mariadbtest mysql -u root --password=secretpassword -e 'create database `420_eform-angular-outer-inner-resource-plugin`'
-        docker exec -i mariadbtest mysql -u root --password=secretpassword 420_eform-angular-outer-inner-resource-plugin < main/420_eform-angular-outer-inner-resource-plugin.sql
+        docker exec -i mariadbtest mariadb -u root --password=secretpassword -e 'create database `420_SDK`'
+        docker exec -i mariadbtest mariadb -u root --password=secretpassword 420_SDK < main/420_SDK.sql
+        docker exec -i mariadbtest mariadb -u root --password=secretpassword -e 'create database `420_eform-angular-outer-inner-resource-plugin`'
+        docker exec -i mariadbtest mariadb -u root --password=secretpassword 420_eform-angular-outer-inner-resource-plugin < main/420_eform-angular-outer-inner-resource-plugin.sql
     - name: Install dependencies
       run: dotnet restore eform-service-outer-inner-resource-plugin
     - name: Build
