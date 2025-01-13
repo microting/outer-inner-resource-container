@@ -44,15 +44,6 @@ jobs:
         repository: microting/eform-angular-frontend
         ref: stable
         path: eform-angular-frontend
-    - name: Cache node_modules
-      id: cache
-      uses: actions/cache@v3
-      with:
-        path: eform-angular-frontend/eform-client/node_modules
-        key: ${{ runner.os }}-build-${{ hashFiles('eform-angular-frontend/eform-client/package.json') }}
-        restore-keys: |
-          ${{ runner.os }}-build-
-          ${{ runner.os }}-
     - uses: actions/download-artifact@v3
       with:
         name: container
@@ -73,7 +64,6 @@ jobs:
         node-version: 20
     - name: yarn install
       run: cd eform-angular-frontend/eform-client && yarn install
-      if: steps.cache.outputs.cache-hit != 'true'
     - name: Create errorShots directory
       run: mkdir eform-angular-frontend/eform-client/errorShots
     - name: Start the newly build Docker container
@@ -238,15 +228,6 @@ jobs:
         repository: microting/eform-angular-outer-inner-resource-plugin
         ref: stable
         path: eform-angular-outer-inner-resource-plugin
-    - name: Cache node_modules
-      id: cache
-      uses: actions/cache@v3
-      with:
-        path: eform-angular-frontend/eform-client/node_modules
-        key: ${{ runner.os }}-build-${{ hashFiles('eform-angular-frontend/eform-client/package.json') }}
-        restore-keys: |
-          ${{ runner.os }}-build-
-          ${{ runner.os }}-
     - name: Copy dependencies
       run: |
         cp -av eform-angular-outer-inner-resource-plugin/eform-client/src/app/plugins/modules/outer-inner-resource-pn eform-angular-frontend/eform-client/src/app/plugins/modules/outer-inner-resource-pn
@@ -259,7 +240,6 @@ jobs:
         cd eform-angular-frontend/eform-client && ../../eform-angular-outer-inner-resource-plugin/testinginstallpn.sh
     - name: yarn install
       run: cd eform-angular-frontend/eform-client && yarn install
-      if: steps.cache.outputs.cache-hit != 'true'
     - name: Create errorShots directory
       run: mkdir eform-angular-frontend/eform-client/errorShots
     - name: Sleep 15 seconds
@@ -479,7 +459,7 @@ jobs:
     - name: Unit Tests
       run: dotnet test --no-restore -c Release -v n eform-service-outer-inner-resource-plugin/ServiceOuterInnerResourcePlugin.Integration.Test/ServiceOuterInnerResourcePlugin.Integration.Test.csproj
   deploy:
-    needs: [frontend-build, outer-inner-resource-test, outer-inner-resource-test-dotnet, service-build, outer-inner-resource-service-test, outer-inner-resource-service-dotnet-test]
+    needs: [frontend-build, frontend-test, frontend-test-dotnet, outer-inner-resource-test, outer-inner-resource-test-dotnet, service-build, outer-inner-resource-service-test, outer-inner-resource-service-dotnet-test]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -508,7 +488,7 @@ jobs:
     - name: Image digest
       run: echo ${{ steps.docker_build.outputs.digest }}
   deploy-service:
-    needs: [frontend-build, outer-inner-resource-test, outer-inner-resource-test-dotnet, service-build, outer-inner-resource-service-test, outer-inner-resource-service-dotnet-test]
+    needs: [frontend-build, frontend-test, frontend-test-dotnet, outer-inner-resource-test, outer-inner-resource-test-dotnet, service-build, outer-inner-resource-service-test, outer-inner-resource-service-dotnet-test]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
